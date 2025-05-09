@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+ <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"/>
+  <link rel="icon" type="image/x-icon" href="/Frontend/Pages/images/oldLogo.png">
+  <link rel="stylesheet" href="style.css">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      updateProfile,
+      signInWithPopup,
+      GoogleAuthProvider
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCU9nYkOE63oskSXTdI5b9-7EEFxAEl_og",
+      authDomain: "infodump-cb10d.firebaseapp.com",
+      projectId: "infodump-cb10d",
+      storageBucket: "infodump-cb10d.firebasestorage.app",
+      messagingSenderId: "438522789846",
+      appId: "1:438522789846:web:7db442f0f51de0110e2e77"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+
+    window.handleSignUp = async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const displayName = document.getElementById("username").value;
+      const message = document.getElementById("message");
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCred.user, { displayName });
+
+        message.textContent = "Sign up successful You can now log in";
+        message.style.color = "#00ffae";
+      } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "#f44336";
+      }
+    };
+
+    window.handleGoogleSignUp = async function () {
+      const message = document.getElementById("message");
+
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        message.textContent = `Welcome ${user.displayName || "user"}! Account created`;
+        message.style.color = "#00ffae";
+      } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "#f44336";
+      }
+    };
+  </script>
+</head>
+<body>
+  <header class="navbar">
+    <div>
+      <a href="index.html" class="nav-item">Home</a>
+    </div>
+  </header>
+
+  <form onsubmit="handleSignUp(event)">
+    <div class="container">
+      <h2>Sign Up</h2>
+      <br>
+      <div>
+        <input type="text" id="username" placeholder="Username" required />
+      </div>
+      <br>
+      <div>
+        <input type="email" id="email" placeholder="Email" required />
+      </div>
+      <br>
+      <div>
+        <input type="password" id="password" placeholder="Password (min 6 characters)" required />
+      </div>
+      <br>
+      <div class="message" id="message"></div>
+      <button type="submit">Sign Up</button>
+      <br>
+      <div style="margin-top: 10px;">
+        <label>Already have an account? <a href="login.html" class="a-login">Login</a></label>
+      </div>
+    </div>
+  </form>
+</body>
+</html>

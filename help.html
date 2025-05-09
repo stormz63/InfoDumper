@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Help</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="/Frontend/Pages/images/oldLogo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+
+    a {
+      color: white;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: red;
+    }
+
+    .section-box {
+      background-color: #2f2f2f;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 15px 0;
+      text-align: center;
+      width: 250px;
+    }
+
+    .section-title {
+      background-color: #444;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    header.navbar {
+      width: 100%;
+      background-color: #1a1a1a;
+      padding: 10px;
+      position: fixed;
+      top: 0;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .nav-item {
+      margin-left: 20px;
+      font-size: 18px;
+    }
+
+    .landing {
+      margin-top: 80px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <a href="index.html" class="nav-item active"><i class="fas fa-home"></i> Home</a>
+  </header>
+
+  <div class="landing">
+    <div class="container">
+      <h2>Help</h2>
+      <div class="section-box">
+        <div class="section-title">
+          <h3>User Management</h3>
+        </div>
+        <a href="reset.html">Resetting Passwords</a>
+      </div>
+
+      <div class="section-box">
+        <div class="section-title">
+          <h3>Payments</h3>
+        </div>
+        <div>
+          <a href="payments.html">Payments with Crypto</a>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <div class="section-title">
+          <h3>Posting</h3>
+        </div>
+        <a href="how_to.html">Creating a new post</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

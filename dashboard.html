@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="/Frontend/Pages/images/oldLogo.png">
+ <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"/>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      updateProfile,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCU9nYkOE63oskSXTdI5b9-7EEFxAEl_og",
+      authDomain: "infodump-cb10d.firebaseapp.com",
+      projectId: "infodump-cb10d",
+      storageBucket: "infodump-cb10d.appspot.com",
+      messagingSenderId: "438522789846",
+      appId: "1:438522789846:web:7db442f0f51de0110e2e77"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const userInfo = document.getElementById("userInfo");
+    const pfpInput = document.getElementById("pfp");
+    const bannerInput = document.getElementById("banner");
+    const bioInput = document.getElementById("bio");
+    const displayNameInput = document.getElementById("displayName");
+    const saveBtn = document.getElementById("saveBtn");
+
+    let currentUser;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return location.href = "login.html";
+      currentUser = user;
+      userInfo.innerText = `Welcome, ${user.displayName || user.email}`;
+
+      const userDoc = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userDoc);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.pfpURL) document.getElementById("pfpPreview").src = data.pfpURL;
+        if (data.bannerURL) document.getElementById("bannerPreview").src = data.bannerURL;
+        if (data.bio) bioInput.value = data.bio;
+        if (data.displayName) displayNameInput.value = data.displayName;
+      }
+    });
+
+    saveBtn.onclick = async () => {
+      const pfp = pfpInput.files[0];
+      const banner = bannerInput.files[0];
+      const bio = bioInput.value;
+      const displayName = displayNameInput.value;
+      let pfpURL = null;
+      let bannerURL = null;
+
+      const uploadToCloudinary = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "infodump_unsigned");
+        const res = await fetch("https://api.cloudinary.com/v1_1/dq8h4pq0m/upload", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        return data.secure_url;
+      };
+
+      if (pfp) pfpURL = await uploadToCloudinary(pfp);
+      if (banner) bannerURL = await uploadToCloudinary(banner);
+
+      const updateData = {
+        bio,
+        displayName,
+      };
+      if (pfpURL) updateData.pfpURL = pfpURL;
+      if (bannerURL) updateData.bannerURL = bannerURL;
+
+      await setDoc(doc(db, "users", currentUser.uid), updateData, { merge: true });
+
+      await updateProfile(currentUser, { displayName });
+
+      alert("Profile updated");
+      location.reload();
+    };
+  </script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-right">
+      <a href="index.html">
+        <button class="nav-item">Home</button>
+      </a>
+    </div>
+  </header>
+
+  <main class="container" style="margin-top: 50px;">
+    <h2 id="userInfo">Loading</h2>
+    <a href="index.html">
+        <button onclick="import('https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js').then(({ getAuth, signOut }) => signOut(getAuth()).then(() => location.href = 'login.html'))" style="width: 60px;">Logout</button>
+    </a>
+    <br>
+    <h3>Update Profile</h3>
+    <hr>
+    <br>
+    <label>Display Name:</label>
+    <input type="text" id="displayName" placeholder="Enter Username"/>
+
+    <label>Profile Picture:</label>
+    <input type="file" id="pfp" accept="image/*" />
+    <img id="pfpPreview" width="100" style="display:block;margin:10px 0;">
+
+    <label>Banner Image:</label>
+    <input type="file" id="banner" accept="image/*" />
+    <img id="bannerPreview" width="200" style="display:block;margin:10px 0;">
+
+    <label>Bio:</label>
+    <textarea id="bio" placeholder="Write your bio"></textarea>
+
+    <button id="saveBtn">Save Changes</button>
+  </main>
+</body>
+</html>

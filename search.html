@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search</title>
+  <link rel="icon" type="image/x-icon" href="/Frontend/Pages/images/oldLogo.png">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    .forum-post {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-left: 5px solid #39FF14;
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      color: #eee;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .forum-post h3 {
+      font-size: 1.1rem;
+      margin: 0 0 5px;
+    }
+    .forum-post .meta {
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 6px;
+    }
+    .paid-tag {
+      color: #ff4444;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+    .post-feed a {
+      color: #2aa5ff;
+      text-decoration: none;
+    }
+    .post-feed a:hover {
+      color: #1e8cd9;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-left">
+      <a href="index.html" class="nav-item active"><i class="fas fa-home"></i> Home</a>
+    </div>
+    <div class="nav-right">
+      <a href="login.html" class="nav-item">Login</a>
+    </div>
+  </header>
+
+  <main class="landing">
+    <div class="container">
+      <h1>Post's</h1>
+      <div id="feed" class="post-feed"></div>
+
+      <div>
+        <br><br>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      orderBy,
+      onSnapshot,
+      getDoc,
+      doc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCU9nYkOE63oskSXTdI5b9-7EEFxAEl_og",
+      authDomain: "infodump-cb10d.firebaseapp.com",
+      projectId: "infodump-cb10d",
+      storageBucket: "infodump-cb10d.appspot.com",
+      messagingSenderId: "438522789846",
+      appId: "1:438522789846:web:7db442f0f51de0110e2e77"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const feed = document.getElementById("feed");
+
+    onAuthStateChanged(auth, async (user) => {
+      let currentCredits = 0;
+      let userId = null;
+      if (user) {
+        userId = user.uid;
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          currentCredits = userDoc.data().credits || 0;
+        }
+      }
+
+      const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+      onSnapshot(q, async (snapshot) => {
+        feed.innerHTML = "";
+        for (const docSnap of snapshot.docs) {
+          const post = docSnap.data();
+          const creatorDoc = await getDoc(doc(db, "users", post.userId));
+          const userData = creatorDoc.exists() ? creatorDoc.data() : {};
+
+          const username = post.username || "unknown";
+          const paid = post.paid === true;
+          const canView = !paid || currentCredits > 0;
+
+          const postHTML = `
+            <div class="forum-post">
+              <h3>
+                <a href="#">${post.title || "Untitled"}</a>
+                ${paid ? '<span class="paid-tag">[PAID]</span>' : ''}
+              </h3>
+              <div class="meta">
+                ${post.category || "Uncategorized"} · by @${username}
+              </div>
+              <hr>
+              <div>${canView ? post.content : '<i>Locked. Requires credits</i>'}</div>
+              ${post.fileURL && canView ? `<a href="${post.fileURL}" target="_blank">📎 Attachment</a>` : ''}
+            </div>
+          `;
+
+          feed.innerHTML += postHTML;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Post</title>
+  <link rel="icon" type="image/x-icon" href="/Frontend/Pages/images/oldLogo.png">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      doc,
+      getDoc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCU9nYkOE63oskSXTdI5b9-7EEFxAEl_og",
+      authDomain: "infodump-cb10d.firebaseapp.com",
+      projectId: "infodump-cb10d",
+      storageBucket: "infodump-cb10d.appspot.com",
+      messagingSenderId: "438522789846",
+      appId: "1:438522789846:web:7db442f0f51de0110e2e77"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("postForm");
+    const title = document.getElementById("title");
+    const content = document.getElementById("content");
+    const category = document.getElementById("category");
+    const fileInput = document.getElementById("fileUpload");
+    const isPaid = document.getElementById("isPaid");
+    const status = document.getElementById("status");
+
+    const CLOUD_NAME = "dq8h4pq0m";
+    const UPLOAD_PRESET = "infodump_unsigned";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        status.innerText = "You must be logged in to post";
+        form.style.display = "none";
+        return;
+      }
+
+      // Ensure user doc exists with credits field
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          displayName: user.displayName || user.email,
+          bio: "",
+          credits: 0
+        });
+      } else if (!userSnap.data().credits) {
+        await setDoc(userRef, { credits: 0 }, { merge: true });
+      }
+
+      status.innerText = `Logged in as @${user.displayName || user.email}`;
+      form.style.display = "block";
+
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+
+        if (!category.value) {
+          status.innerText = "Please select a category";
+          return;
+        }
+
+        let fileURL = null;
+
+        try {
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", UPLOAD_PRESET);
+
+            const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+              method: "POST",
+              body: formData
+            });
+
+            const cloudData = await cloudRes.json();
+            fileURL = cloudData.secure_url;
+          }
+
+          await addDoc(collection(db, "posts"), {
+            title: title.value,
+            content: content.value,
+            category: category.value,
+            username: user.displayName || user.email,
+            userId: user.uid,
+            fileURL: fileURL,
+            paid: isPaid.checked,
+            createdAt: serverTimestamp()
+          });
+
+          status.innerText = "Post submitted, redirecting";
+          setTimeout(() => window.location.href = "search.html", 1000);
+        } catch (err) {
+          console.error("Post Error:", err);
+          status.innerText = "Error: " + err.message;
+        }
+      };
+    });
+  </script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-left"><a href="index.html" class="nav-item active">Home</a></div>
+    <div class="nav-right"><a href="login.html" class="nav-button">Login</a></div>
+  </header>
+
+  <main class="main-content">
+    <form id="postForm" style="display: none;" class="container">
+      <h2>Create New Post</h2>
+      <div id="status" style="margin-bottom: 20px;"></div>
+      <input id="title" type="text" placeholder="Post Title" required /><br><br>
+      <textarea id="content" placeholder="Post Content" required></textarea><br><br>
+      <input type="file" id="fileUpload" accept="image/*,.pdf,.zip,.txt,.rar,.docx" /><br>
+      <small>Optional file upload</small><br><br>
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <option value="Casual">Casual</option>
+        <option value="Dox">Dox</option>
+        <option value="Leak">Leak</option>
+        <option value="Tools">Tools</option>
+        <option value="Scripts">Scripts</option>
+        <option value="VPNs">VPNs</option>
+        <option value="Tutorials">Tutorials</option>
+      </select><br><br>
+      <label><input type="checkbox" id="isPaid" /> Paid post?</label><br><br>
+      <button type="submit">Post</button>
+    </form>
+  </main>
+</body>
+</html>

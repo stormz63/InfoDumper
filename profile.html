@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="/Frontend/Pages/images/oldLogo.png">
+  <style>
+    .profile-header {
+      text-align: center;
+      color: white;
+    }
+
+    .profile-banner {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-bottom: 3px solid #333;
+    }
+
+    .profile-pfp {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #444;
+      margin-top: -64px;
+      background-color: #111;
+      margin-top: -64;
+      margin-bottom: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.6);
+    }
+
+    .profile-bio {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #ccc;
+      max-width: 600px;
+      margin-inline: auto;
+      text-align: center;
+    }
+  </style>
+</head>
+<body style="background-color: black; font-family: Orbitron, sans-serif;">
+  <div id="profile" class="profile-header">
+    <img id="banner" class="profile-banner" src="" alt="Banner">
+    <img id="pfp" class="profile-pfp" src="" alt="PFP">
+    <h2 id="username"></h2>
+    <p id="bio" class="profile-bio"></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore, doc, getDoc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCU9nYkOE63oskSXTdI5b9-7EEFxAEl_og",
+      authDomain: "infodump-cb10d.firebaseapp.com",
+      projectId: "infodump-cb10d",
+      storageBucket: "infodump-cb10d.appspot.com",
+      messagingSenderId: "438522789846",
+      appId: "1:438522789846:web:7db442f0f51de0110e2e77"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("userId");
+
+    if (userId) {
+      const userRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        document.getElementById("banner").src = data.bannerURL || "https://via.placeholder.com/800x200";
+        document.getElementById("pfp").src = data.pfpURL || "https://via.placeholder.com/128";
+        document.getElementById("username").innerText = `@${data.username || "unknown"}`;
+        document.getElementById("bio").innerText = data.bio || "No bio provided.";
+      } else {
+        document.getElementById("profile").innerHTML = "<h2>User not found</h2>";
+      }
+    } else {
+      document.getElementById("profile").innerHTML = "<h2>Invalid Profile</h2>";
+    }
+  </script>
+</body>
+</html>
