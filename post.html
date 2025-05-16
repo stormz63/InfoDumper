@@ -54,7 +54,6 @@
         return;
       }
 
-      // Ensure user doc exists with credits field
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
       if (!userSnap.exists()) {
@@ -125,7 +124,13 @@
 
   <main class="main-content">
     <form id="postForm" style="display: none;" class="container">
-      <h2>Create New Post</h2>
+      <div class="container" style="padding: 10px;">
+        <div class="section-box">
+          <div class="section-title">
+            <h3>Create a post</h3>
+          </div>
+        </div>
+        <br>
       <div id="status" style="margin-bottom: 20px;"></div>
       <input id="title" type="text" placeholder="Post Title" required /><br><br>
       <textarea id="content" placeholder="Post Content" required></textarea><br><br>
@@ -141,7 +146,7 @@
         <option value="VPNs">VPNs</option>
         <option value="Tutorials">Tutorials</option>
       </select><br><br>
-      <label><input type="checkbox" id="isPaid" /> Paid post?</label><br><br>
+      <label><input type="checkbox" id="isPaid"/> Is paid?</label><br><br>
       <button type="submit">Post</button>
     </form>
   </main>

@@ -8,6 +8,76 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-left" style="margin-left: 30px;">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <a href="search.html"><i class="fas fa-search"></i> Search</a>
+      <a href="credits.html"><i class="fas fa-coins"></i> Credits</a>
+      <a href="market.html"><i class="fas fa-store"></i> Market</a>
+      <a href="about.html"><i class="fas fa-list"></i> About</a>
+      <a href="help.html"><i class="fas fa-question-circle"></i> Help</a>
+      <a href="post.html"><i class="fas fa-plus-circle"></i> Create</a>
+    </div>
+    <div class="nav-right" style="margin-right: 30px;">
+      <a href="dashboard.html"><i class="fa-regular fa-circle-user"></i> Dashboard</a>
+      <a href="login.html"><i class="fa-regular fa-user"></i> Login</a>
+      <a href="register.html"><i class="fa-solid fa-user-plus"></i> Register</a>
+    </div>
+  </header>
+
+  <main class="landing-main">
+    <a href="index.html">
+      <div class="a-hover-index">
+        <h1>InfoDump</h1>
+        <p>— Be your own dumper —</p>
+      </div>
+    </a>
+
+    <div class="layout">
+      <div class="announcements-box" style="padding: 1px;">
+        <div class="section-box2">
+          <div class="section-title1">
+            <h3>Announcements</h3>
+          </div>
+          <br>
+          <div style="padding: 15px;">
+            <h2>May 15</h2>
+            <h3>Added new background images for every page, and a few new details</h3>
+
+            <form id="contactForm" style="margin-top: 20px;">
+              <h2>Send us suggestions for the marketplace</h2>
+              <br>
+              <input type="text" name="name" id="contactName" placeholder="Your Username" required/>
+              <textarea id="contactMessage" name="message" rows="4" placeholder="Your Message" required></textarea>
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="payments-box" style="padding: 1px;">
+        <div class="section-box1">
+          <div class="section-title1">
+            <h3>Payments we accept</h3>
+          </div>
+          <h3>Bitcoin</h3>
+          <img src="bitcoin.png" alt="Bitcoin">
+          <h3>Ethereum</h3>
+          <img src="ethereum.png" alt="Ethereum">
+          <h3>Monero</h3>
+          <img src="monero.png" alt="Monero">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <h3>&copy; 2025 InfoDump. All rights reserved.</h3>
+    <h4>Powered by Netlify and Firebase</h4>
+  </footer>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import {
@@ -37,10 +107,6 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    const messageInput = document.getElementById("shoutInput");
-    const sendBtn = document.getElementById("shoutSend");
-    const messagesBox = document.getElementById("shoutboxMessages");
-
     let currentUser = "Anonymous";
 
     onAuthStateChanged(auth, user => {
@@ -49,217 +115,24 @@
       }
     });
 
-    sendBtn.addEventListener("click", async () => {
-      const content = messageInput.value.trim();
-      if (!content) return;
-      await addDoc(collection(db, "shouts"), {
-        username: currentUser,
-        message: content,
-        createdAt: serverTimestamp()
-      });
-      messageInput.value = "";
-    });
+    const contactForm = document.getElementById("contactForm");
+    if (contactForm) {
+      contactForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("contactName").value.trim();
+        const message = document.getElementById("contactMessage").value.trim();
+        if (!name || !message) return;
 
-    const q = query(collection(db, "shouts"), orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-      messagesBox.innerHTML = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const div = document.createElement("div");
-        div.className = "shoutbox-message";
-        div.innerHTML = `
-          <img src="/Frontend/Pages/images/oldLogo.png" alt="user">
-          <div class="shoutbox-message-content"><strong>${data.username}:</strong> ${data.message}</div>
-        `;
-        messagesBox.appendChild(div);
+        await addDoc(collection(db, "contactMessages"), {
+          name,
+          message,
+          createdAt: serverTimestamp()
+        });
+
+        contactForm.reset();
+        alert("Message sent");
       });
-    });
+    }
   </script>
-  <style>
-
-    .landing-main {
-      text-align: center;
-      padding: 40px 0;
-    }
-
-    .logo-img {
-      width: 320px;
-      margin-bottom: 20px;
-    }
-
-    .layout {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 50px;
-      padding: 40px;
-    }
-
-    .shoutbox-wrapper {
-      background-color: #1a1a1a;
-      border: 1px solid #333;
-      padding: 30px;
-      border-radius: 12px;
-      width: 650px;
-      height: 500px;
-    }
-
-    .shoutbox-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      border-bottom: 1px solid #39FF14;
-      padding-bottom: 8px;
-      font-size: 1.2rem;
-    }
-
-    .shoutbox-messages {
-      max-height: 300px;
-      overflow-y: auto;
-      padding: 10px;
-      background-color: #0f0f0f;
-      border-radius: 6px;
-      height: 100%;
-    }
-
-    .shoutbox-message {
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 12px;
-      gap: 12px;
-    }
-
-    .shoutbox-message img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-    }
-
-    .shoutbox-message-content {
-      background: #222;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      color: #ccc;
-    }
-
-    .shoutbox-input {
-      display: flex;
-      margin-top: 15px;
-      gap: 12px;
-      width: 90px;
-    }
-
-    .shoutbox-input input {
-      flex: 1;
-      padding: 12px;
-      background-color: #1a1a1a;
-      font-size: 1rem;
-      border: solid;
-      border-color: rgb(66, 66, 66);
-      border-width: 2px;
-    }
-
-    .shoutbox-input button {
-      background: rgb(88, 88, 88);
-      color: black;
-      padding: 12px 24px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      border-radius: 6px;
-    }
-
-    .payments-box {
-      background-color: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
-      padding: 25px;
-      color: #fff;
-      width: 300px;
-      height: 500px;
-    }
-
-    .payments-box h2 {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-      text-align: center;
-      border-bottom: 1px solid #39FF14;
-      padding-bottom: 10px;
-    }
-
-    .payments-box h3 {
-      font-size: 1rem;
-      margin: 20px 0 10px;
-      text-align: center;
-      color: #ccc;
-    }
-
-    .payments-box img {
-      display: block;
-      margin: 0 auto 10px;
-      width: 64px;
-      height: 64px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: x-small;
-    }
-  </style>
-</head>
-<body>
-  <header class="navbar">
-    <div class="nav-left">
-      <a href="index.html"><i class="fas fa-home"></i> Home</a>
-      <a href="search.html"><i class="fas fa-search"></i> Search</a>
-      <a href="credits.html"><i class="fas fa-coins"></i> Credits</a>
-      <a href="market.html"><i class="fas fa-store"></i> Market</a>
-      <a href="about.html"><i class="fas fa-list"></i> About</a>
-      <a href="help.html"><i class="fas fa-question-circle"></i> Help</a>
-      <a href="post.html"><i class="fas fa-plus-circle"></i> Create</a>
-    </div>
-    <div class="nav-right">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="login.html">Login</a>
-      <a href="register.html">Register</a>
-    </div>
-  </header>
-
-  <main class="landing-main">
-    <div class="a-hover-index">
-      <img src="Logo.png" class="logo-img" alt="InfoDump Logo">
-    </div>
-
-    <div class="layout">
-      <div class="shoutbox-wrapper">
-        <div class="shoutbox-header">
-          <h2>Shoutbox</h2>
-        </div>
-        <div class="shoutbox-messages" id="shoutboxMessages"></div>
-        <div class="shoutbox-input">
-          <input type="text" id="shoutInput" placeholder="Enter your message..." style="width: 190px;">
-          <button id="shoutSend" style="margin-left: 330%;">Send</button>
-        </div>
-      </div>
-
-      <div class="payments-box">
-        <h2>Payments we accept</h2>
-        <h3>Bitcoin</h3>
-        <img src="bitcoin.png" alt="Bitcoin">
-        <h3>Ethereum</h3>
-        <img src="ethereum.png" alt="Ethereum" style="height: 20%;">
-        <h3>Monero</h3>
-        <img src="monero.png" alt="Monero">
-      </div>
-    </div>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 InfoDump. All rights reserved.</p>
-  </footer>
 </body>
 </html>

@@ -8,61 +8,6 @@
   <link rel="icon" type="image/x-icon" href="/Frontend/Pages/oldLogo.png">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <style>
-
-    a {
-      color: white;
-      text-decoration: none;
-    }
-
-    a:hover {
-      color: red;
-    }
-
-    .section-box {
-      background-color: #2f2f2f;
-      border-radius: 10px;
-      padding: 20px;
-      margin: 15px 0;
-      text-align: center;
-      width: 250px;
-    }
-
-    .section-title {
-      background-color: #444;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-
-    header.navbar {
-      width: 100%;
-      background-color: #1a1a1a;
-      padding: 10px;
-      position: fixed;
-      top: 0;
-      display: flex;
-      justify-content: flex-start;
-    }
-
-    .nav-item {
-      margin-left: 20px;
-      font-size: 18px;
-    }
-
-    .landing {
-      margin-top: 80px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-  </style>
 </head>
 <body>
   <header class="navbar">
@@ -70,31 +15,36 @@
   </header>
 
   <div class="landing">
-    <div class="container">
-      <h2>Help</h2>
+    <div class="container-help">
       <div class="section-box">
         <div class="section-title">
-          <h3>User Management</h3>
+          <h3>User Maintenance</h3>
         </div>
-        <a href="reset.html">Resetting Passwords</a>
+        <div>
+          <br>
+          <a href="registration.html" class="help-a">User Registration</a>
       </div>
-
+        <br>
+        <a href="reset.html" class="help-a">Resetting Passwords</a>
+      </div>
+      <br>
       <div class="section-box">
         <div class="section-title">
           <h3>Payments</h3>
         </div>
         <div>
-          <a href="payments.html">Payments with Crypto</a>
+          <br>
+          <a href="payments.html" class="help-a">Payments with Crypto</a>
         </div>
       </div>
-
+      <br>
       <div class="section-box">
         <div class="section-title">
           <h3>Posting</h3>
         </div>
-        <a href="how_to.html">Creating a new post</a>
+        <br>
+        <a href="how_to.html" class="help-a">Creating a new post</a>
       </div>
-
     </div>
   </div>
 </body>

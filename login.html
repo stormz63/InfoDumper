@@ -92,9 +92,13 @@
     </div>
   </header>
 
-  <div class="container">
+  <div class="container" style="padding: 10px;">
       <form onsubmit="handleLogin(event)">
-      <h2>Login</h2>
+        <div class="section-box">
+          <div class="section-title">
+            <h3>Login</h3>
+          </div>
+        </div>
       <br>
       <input type="email" id="email" placeholder="Email" required /><br><br>
       <input type="password" id="password" placeholder="Password" required /><br><br>
@@ -105,7 +109,7 @@
         <div style="text-align: center; margin-top: 20px;">
           <button id="logoutBtn" onclick="handleLogout()" style="display: none;">Logout</button>
         </div>
-
+        <br>
       <label>Don't have an account? <a href="register.html" class="a-login">Sign Up</a></label>
   </form>
   </div>
